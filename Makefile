@@ -7,10 +7,13 @@ OBJS_DIR =	objs
 CC =		clang
 FLAGS_CC =	-Wall -Wextra -Werror
 FLAGS_MLX =	-lm -lbsd -lX11 -lXext -L ./$(MLX_DIR) -lmlx
-HEAD =		-I./include -I./$(MLX_DIR)
 
+HEAD =		-I./includes -I./$(MLX_DIR)
+					
 MLX =		$(MLX_DIR)/libmlx.a
-SRCS =		$(SRC_DIR)/teste.c
+SRCS =		$(SRC_DIR)/main.c \
+				$(SRC_DIR)/geom.c
+
 OBJS =		$(patsubst $(SRC_DIR)%.c, $(OBJS_DIR)%.o, $(SRCS))
 
 RM =		/bin/rm -rf
