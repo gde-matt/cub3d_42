@@ -1,5 +1,11 @@
 #include "../includes/cub3d.h"
 
+int		close(int keycode, t_vars *vars)
+{
+	mlx_destroy_window(vars->mlx, vars->win);
+	return 0;
+}
+
 int		create_trgb(int t, int r, int g, int b)
 {
 	return(t << 24 | r << 16 | g << 8 | b);
@@ -36,9 +42,10 @@ void	draw_map(t_data *data, int n_rows, int n_cols, int map[n_rows][n_cols], int
 
 int		main(void)
 {
-	void	*mlx;
-	void	*mlx_win;
+	//void	*mlx;
+	//void	*mlx_win;
 	t_data	img;
+	t_vars	vars;
 
 	int	map[7][10] = {
 		{1,1,1,1,1,1,1,1,1,1},
@@ -51,9 +58,9 @@ int		main(void)
 	};
 
 
-	mlx = mlx_init();
-	mlx_win = mlx_new_window(mlx, 420, 294, "Hello Word");
-	img.img = mlx_new_image(mlx, 420, 294);
+	vars.mlx = mlx_init();
+	vars.win = mlx_new_window(vars.mlx, 420, 294, "Hello Word");
+	img.img = mlx_new_image(vars.mlx, 420, 294);
 	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian);
 	
 	//my_mlx_pixel_put(&img,  10, 10, 0x00FFFF00);
@@ -64,7 +71,7 @@ int		main(void)
 	//draw_empty_circle(&img, 300, 100, 50, 0x00FF0000);
 
 	draw_map(&img, 7, 10, map, 42);
-	mlx_put_image_to_window(mlx, mlx_win, img.img, 0, 0);
-
-	mlx_loop(mlx);
+	mlx_put_image_to_window(vars.mlx, vars.win, img.img, 0, 0);
+	mlx_hook(vars.win, 2, 1L<<0, close, &vars);
+	mlx_loop(vars.mlx);
 }
