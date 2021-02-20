@@ -11,7 +11,7 @@ int		create_trgb(int t, int r, int g, int b)
 	return(t << 24 | r << 16 | g << 8 | b);
 }
 
-void	draw_map(t_data *data, int n_rows, int n_cols, int map[n_rows][n_cols], int block_size)
+void	draw_map(t_img *img, int n_rows, int n_cols, int map[n_rows][n_cols], int block_size)
 {
 	int	row;
 	int	col;
@@ -31,23 +31,76 @@ void	draw_map(t_data *data, int n_rows, int n_cols, int map[n_rows][n_cols], int
 			x_pos = col * block_size;
 			y_pos = row * block_size;
 			if (map[row][col] == 1)
-				draw_filled_rectangle(data, x_pos, y_pos, block_size, block_size, white);
+				draw_filled_rectangle(img, x_pos, y_pos, block_size, block_size, white);
 			else
-				draw_filled_rectangle(data, x_pos, y_pos, block_size, block_size, black);
+				draw_filled_rectangle(img, x_pos, y_pos, block_size, block_size, black);
 			col++;
 		}
 		row++;
 	}
 }
 
-int		main(void)
+void	start_player(t_vars *vars)
 {
-	//void	*mlx;
-	//void	*mlx_win;
-	t_data	img;
-	t_vars	vars;
+	vars->player.coord.x = 50;
+	vars->player.coord.y = 50;
+	vars->player.size = 4;
+	vars->player.turnDirection = PI/2;
+	vars->player.walkSpeed = 10;
+	vars->player.turnSpeed = 45 * (PI/2);
+}
 
-	int	map[7][10] = {
+int close_window(t_vars *vars)
+{
+	mlx_destroy_window(vars->mlx, vars->win);
+	vars->win = NULL;
+	exit(1);
+	return (0);
+}
+
+int keyPress(int keycode, t_vars *vars)
+{
+    if (keycode == ESC)
+		close_window(vars);
+    if (keycode == UP)
+		vars->player.walkDirection = 1;
+    if (keycode == DOWN)
+		vars->player.walkDirection = -1;
+	vars->update =  1;
+	return (0);
+}
+
+int keyRelease(int keycode, t_vars *vars)
+{
+    if (keycode == UP)
+		vars->player.walkDirection = 0;
+	if (keycode == DOWN)
+		vars->player.walkDirection = 0;
+	vars->update =  1;
+	return (0);
+}
+
+int renderPlayer(t_vars *vars)
+{
+	draw_filled_rectangle(vars, vars->player.coord.x, vars->player.coord.y,
+	vars->player.size, vars->player.size, create_trgb(0, 255, 0, 0));
+	return(0);
+}
+
+int movePlayer(t_vars *vars)
+{
+	float nx = vars->player.coord.x + vars->player.walkDirection * 5;
+	float ny = vars->player.coord.y + vars->player.walkDirection * 5;
+
+	vars->player.coord.x = nx;
+	vars->player.coord.y = ny;
+
+	return(0);
+}
+
+int	print_map(t_vars *vars)
+{
+	int	map[N_ROWS][N_COLS] = {
 		{1,1,1,1,1,1,1,1,1,1},
 		{1,0,0,0,0,0,0,0,0,1},
 		{1,0,0,0,0,0,0,0,0,1},
@@ -57,21 +110,46 @@ int		main(void)
 		{1,1,1,1,1,1,1,1,1,1}
 	};
 
+	draw_map(vars->img.img, N_ROWS, N_COLS, map, BLOCK_SIZE);
+	renderPlayer(vars);
 
+	return (0);
+}
+
+int update(t_vars *vars)
+{
+	movePlayer(vars);
+	return (0);
+
+}
+
+int game(t_vars *vars)
+{
+	if (vars->update)
+	{
+		update(vars);
+		print_map(vars);
+	}
+	return (0);
+}
+
+int		main(void)
+{
+
+	t_vars	vars;
+
+	start_player(&vars.player);
+	vars.update = 0;
 	vars.mlx = mlx_init();
-	vars.win = mlx_new_window(vars.mlx, 420, 294, "Hello Word");
-	img.img = mlx_new_image(vars.mlx, 420, 294);
-	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian);
-	
-	//my_mlx_pixel_put(&img,  10, 10, 0x00FFFF00);
-	//draw_horizontal_line(&img, 100, 250, 150, 0x00FF0000);
-	//draw_vertical_line(&img, 100, 250, 150, 0x000000FF);
-	//draw_filled_rectangle(&img, 20, 20, 30, 50, 0x0000FF00);
-	//draw_empty_rectangle(&img, 60, 20, 50, 80, 0x0000FF00);
-	//draw_empty_circle(&img, 300, 100, 50, 0x00FF0000);
+	vars.win = mlx_new_window(vars.mlx, S_WIDTH, S_HEIGHT, "Hello Word");
+	vars.img.img = mlx_new_image(vars.mlx, S_WIDTH, S_HEIGHT);
+	vars.img.addr = mlx_get_data_addr(vars.img.img, &vars.img.bits_per_pixel, &vars.img.line_length, &vars.img.endian);
 
-	draw_map(&img, 7, 10, map, 42);
-	mlx_put_image_to_window(vars.mlx, vars.win, img.img, 0, 0);
-	mlx_hook(vars.win, 2, 1L<<0, close, &vars);
+	mlx_hook(vars.win, 2, 1L<<0, keyPress, &vars);
+	mlx_hook(vars.win, 3, 1L<<1, keyRelease, &vars);
+	mlx_hook(vars.win, 33, 1L<<17, close, &vars);
+	mlx_loop_hook(vars.mlx, game, &vars);
+	
+	mlx_put_image_to_window(vars.mlx, vars.win, vars.img.img, 0, 0);
 	mlx_loop(vars.mlx);
 }
