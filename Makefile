@@ -11,8 +11,12 @@ FLAGS_MLX =	-lm -lbsd -lX11 -lXext -L ./$(MLX_DIR) -lmlx
 HEAD =		-I./includes -I./$(MLX_DIR)
 					
 MLX =		$(MLX_DIR)/libmlx.a
-SRCS =		$(SRC_DIR)/main.c \
-				$(SRC_DIR)/geom.c
+SRCS =		$(SRC_DIR)/main_gnl.c \
+			$(SRC_DIR)/get_next_line.c \
+			$(SRC_DIR)/get_next_line_utils.c \
+			$(SRC_DIR)/check_inputs.c \
+			$(SRC_DIR)/ft_aux.c \
+				
 
 OBJS =		$(patsubst $(SRC_DIR)%.c, $(OBJS_DIR)%.o, $(SRCS))
 
