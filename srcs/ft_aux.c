@@ -1,4 +1,5 @@
 #include "../includes/cub3d.h"
+#include "../includes/get_next_line.h"
 
 int		count_words(char const *s, char c)
 {
@@ -108,4 +109,41 @@ int	ft_strncmp(const char *s1, const char *s2, unsigned long int n)
 		else
 			return (auxs1[i] - auxs2[i]);
 	return (0);
+}
+
+int	ft_isspace(char c)
+{
+	if (c == '\t'
+			|| c == '\n'
+			|| c == '\v'
+			|| c == '\f'
+			|| c == '\r'
+			|| c == ' ')
+		return (1);
+	return (0);
+}
+
+int	ft_atoi(const char *str)
+{
+	int i;
+	int res;
+	int signal;
+
+	signal = 1;
+	res = 0;
+	i = 0;
+	while (ft_isspace(str[i]) == 1)
+		i++;
+	if (str[i] == '+' || str[i] == '-')
+	{
+		if (str[i] == '-')
+			signal = signal * -1;
+		i++;
+	}
+	while (str[i] >= 48 && str[i] <= 57)
+	{
+		res = (res * 10) + (str[i] - '0');
+		i++;
+	}
+	return (res * signal);
 }

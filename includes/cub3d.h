@@ -88,16 +88,18 @@ int     print_map(t_vars *vars);
 int     update(t_vars *vars);
 int     game(t_vars *vars);
 
-int     process_input(char *file, t_inputs inputs);
-int     verify_line(char **line, t_inputs inputs);
-int     check_arg(char **info, t_inputs inputs);
+int     process_input(char *file, t_inputs *inputs);
+int     verify_line(char **line, t_inputs *inputs);
+int     check_arg(char **info, t_inputs *inputs);
+int     arg_screen(char **info, t_inputs *inputs);
 
 char	**ft_split(char const *s, char c);
 char	**fill_matrix(char **matrix, char const *s, char c);
 char	**fill_cols(char **matrix, char const *s, char c);
 int		count_words(char const *s, char c);
 int     ft_strncmp(const char *s1, const char *s2, unsigned long int n);
-
+int	    ft_isspace(char c);
+int	    ft_atoi(const char *str);
 
 
 #endif
